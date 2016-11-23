@@ -22,6 +22,12 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
 
     public function __construct(ReadableStreamInterface $input, $assoc = false, $depth = 512, $options = 0)
     {
+        // @codeCoverageIgnoreStart
+        if ($options !== 0 && PHP_VERSION < 5.4) {
+            throw new \BadMethodCallException('Options parameter is only supported on PHP 5.4+');
+        }
+        // @codeCoverageIgnoreEnd
+
         $this->input = $input;
 
         if (!$input->isReadable()) {
@@ -87,7 +93,11 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
             $this->buffer = (string)substr($this->buffer, $newline + 1);
 
             // decode data with options given in ctor
-            $data = json_decode($data, $this->assoc, $this->depth, $this->options);
+            if ($this->options === 0) {
+                $data = json_decode($data, $this->assoc, $this->depth);
+            } else {
+                $data = json_decode($data, $this->assoc, $this->depth, $this->options);
+            }
 
             // abort stream if decoding failed
             if ($data === null && json_last_error() !== JSON_ERROR_NONE) {

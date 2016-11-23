@@ -18,9 +18,14 @@ class Encoder extends EventEmitter implements WritableStreamInterface
 
     public function __construct(WritableStreamInterface $output, $options = 0, $depth = 512)
     {
+        // @codeCoverageIgnoreStart
         if (defined('JSON_PRETTY_PRINT') && $options & JSON_PRETTY_PRINT) {
             throw new \InvalidArgumentException('Pretty printing not available for NDJSON');
         }
+        if ($depth !== 512 && PHP_VERSION < 5.5) {
+            throw new \BadMethodCallException('Depth parameter is only supported on PHP 5.5+');
+        }
+        // @codeCoverageIgnoreEnd
 
         $this->output = $output;
 
@@ -43,7 +48,11 @@ class Encoder extends EventEmitter implements WritableStreamInterface
         }
 
         // encode data with options given in ctor
-        $data = json_encode($data, $this->options, $this->depth);
+        if ($this->depth === 512) {
+            $data = json_encode($data, $this->options);
+        } else {
+            $data = json_encode($data, $this->options, $this->depth);
+        }
 
         // abort stream if encoding fails
         if ($data === false && json_last_error() !== JSON_ERROR_NONE) {
