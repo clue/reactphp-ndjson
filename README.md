@@ -55,6 +55,7 @@ $stream = new Decoder($stdin, true);
 $stream->on('data', function ($data) {
     // JSON objects will be emitted as assoc arrays now
 });
+```
 
 If the underlying stream emits an `error` event or the plain stream contains
 any data that does not represent a valid NDJson stream,
