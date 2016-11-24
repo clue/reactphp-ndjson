@@ -47,11 +47,31 @@ class Encoder extends EventEmitter implements WritableStreamInterface
             return false;
         }
 
+        // we have to handle PHP warning for legacy PHP < 5.5 (see below)
+        if (PHP_VERSION_ID < 50500) {
+            $found = null;
+            set_error_handler(function ($error) use (&$found) {
+                $found = $error;
+            });
+        }
+
         // encode data with options given in ctor
         if ($this->depth === 512) {
             $data = json_encode($data, $this->options);
         } else {
             $data = json_encode($data, $this->options, $this->depth);
+        }
+
+        // legacy error handler for PHP < 5.5
+        // certain values (such as INF etc.) emit a warning, but still encode successfully
+        if (PHP_VERSION_ID < 50500) {
+            restore_error_handler();
+
+            // emit an error event if a warning has been raised
+            if ($found !== null) {
+                $this->emit('error', array(new \RuntimeException('Unable to encode JSON: ' . $found)));
+                return $this->close();
+            }
         }
 
         // abort stream if encoding fails
