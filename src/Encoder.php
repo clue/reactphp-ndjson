@@ -18,9 +18,14 @@ class Encoder extends EventEmitter implements WritableStreamInterface
 
     public function __construct(WritableStreamInterface $output, $options = 0, $depth = 512)
     {
+        // @codeCoverageIgnoreStart
         if (defined('JSON_PRETTY_PRINT') && $options & JSON_PRETTY_PRINT) {
             throw new \InvalidArgumentException('Pretty printing not available for NDJSON');
         }
+        if ($depth !== 512 && PHP_VERSION < 5.5) {
+            throw new \BadMethodCallException('Depth parameter is only supported on PHP 5.5+');
+        }
+        // @codeCoverageIgnoreEnd
 
         $this->output = $output;
 
@@ -42,8 +47,32 @@ class Encoder extends EventEmitter implements WritableStreamInterface
             return false;
         }
 
+        // we have to handle PHP warning for legacy PHP < 5.5 (see below)
+        if (PHP_VERSION_ID < 50500) {
+            $found = null;
+            set_error_handler(function ($error) use (&$found) {
+                $found = $error;
+            });
+        }
+
         // encode data with options given in ctor
-        $data = json_encode($data, $this->options, $this->depth);
+        if ($this->depth === 512) {
+            $data = json_encode($data, $this->options);
+        } else {
+            $data = json_encode($data, $this->options, $this->depth);
+        }
+
+        // legacy error handler for PHP < 5.5
+        // certain values (such as INF etc.) emit a warning, but still encode successfully
+        if (PHP_VERSION_ID < 50500) {
+            restore_error_handler();
+
+            // emit an error event if a warning has been raised
+            if ($found !== null) {
+                $this->emit('error', array(new \RuntimeException('Unable to encode JSON: ' . $found)));
+                return $this->close();
+            }
+        }
 
         // abort stream if encoding fails
         if ($data === false && json_last_error() !== JSON_ERROR_NONE) {
