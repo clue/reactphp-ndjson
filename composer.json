@@ -19,6 +19,6 @@
     },
     "require-dev": {
         "react/event-loop": " ^0.4 || ^0.3",
-        "phpunit/phpunit": "^4.8"
+        "phpunit/phpunit": "^5.0 || ^4.8"
     }
 }
