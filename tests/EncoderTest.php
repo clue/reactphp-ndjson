@@ -28,7 +28,7 @@ class EncoderTest extends TestCase
 
     public function testWriteString()
     {
-        $this->output = $this->getMock('React\Stream\WritableStreamInterface');
+        $this->output = $this->getMockBuilder('React\Stream\WritableStreamInterface')->getMock();
         $this->output->expects($this->once())->method('isWritable')->willReturn(true);
         $this->encoder = new Encoder($this->output);
 
@@ -39,7 +39,7 @@ class EncoderTest extends TestCase
 
     public function testWriteNull()
     {
-        $this->output = $this->getMock('React\Stream\WritableStreamInterface');
+        $this->output = $this->getMockBuilder('React\Stream\WritableStreamInterface')->getMock();
         $this->output->expects($this->once())->method('isWritable')->willReturn(true);
         $this->encoder = new Encoder($this->output);
 
@@ -50,7 +50,7 @@ class EncoderTest extends TestCase
 
     public function testWriteInfiniteWillEmitErrorAndClose()
     {
-        $this->output = $this->getMock('React\Stream\WritableStreamInterface');
+        $this->output = $this->getMockBuilder('React\Stream\WritableStreamInterface')->getMock();
         $this->output->expects($this->once())->method('isWritable')->willReturn(true);
         $this->encoder = new Encoder($this->output);
 
@@ -66,7 +66,7 @@ class EncoderTest extends TestCase
 
     public function testEndWithoutDataWillEndOutputWithoutData()
     {
-        $this->output = $this->getMock('React\Stream\WritableStreamInterface');
+        $this->output = $this->getMockBuilder('React\Stream\WritableStreamInterface')->getMock();
         $this->output->expects($this->once())->method('isWritable')->willReturn(true);
         $this->encoder = new Encoder($this->output);
 
@@ -78,7 +78,7 @@ class EncoderTest extends TestCase
 
     public function testEndWithDataWillForwardDataAndEndOutputWithoutData()
     {
-        $this->output = $this->getMock('React\Stream\WritableStreamInterface');
+        $this->output = $this->getMockBuilder('React\Stream\WritableStreamInterface')->getMock();
         $this->output->expects($this->once())->method('isWritable')->willReturn(true);
         $this->encoder = new Encoder($this->output);
 
@@ -106,7 +106,7 @@ class EncoderTest extends TestCase
 
     public function testPassingClosedStreamToEncoderWillCloseImmediately()
     {
-        $this->output = $this->getMock('React\Stream\WritableStreamInterface');
+        $this->output = $this->getMockBuilder('React\Stream\WritableStreamInterface')->getMock();
         $this->output->expects($this->once())->method('isWritable')->willReturn(false);
         $this->encoder = new Encoder($this->output);
 
@@ -115,7 +115,7 @@ class EncoderTest extends TestCase
 
     public function testWritingToClosedStreamWillNotForwardData()
     {
-        $this->output = $this->getMock('React\Stream\WritableStreamInterface');
+        $this->output = $this->getMockBuilder('React\Stream\WritableStreamInterface')->getMock();
         $this->output->expects($this->once())->method('isWritable')->willReturn(false);
         $this->encoder = new Encoder($this->output);
 
