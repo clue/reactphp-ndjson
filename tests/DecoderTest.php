@@ -1,6 +1,6 @@
 <?php
 
-use React\Stream\ReadableStream;
+use React\Stream\ReadableResourceStream;
 use Clue\React\NDJson\Decoder;
 
 class DecoderTest extends TestCase
@@ -10,7 +10,10 @@ class DecoderTest extends TestCase
 
     public function setUp()
     {
-        $this->input = new ReadableStream();
+        $stream = fopen('php://temp', 'r');
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+
+        $this->input = new ReadableResourceStream($stream, $loop);
         $this->decoder = new Decoder($this->input);
     }
 

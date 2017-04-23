@@ -1,6 +1,6 @@
 <?php
 
-use React\Stream\WritableStream;
+use React\Stream\WritableResourceStream;
 use Clue\React\NDJson\Encoder;
 
 class EncoderTest extends TestCase
@@ -10,7 +10,10 @@ class EncoderTest extends TestCase
 
     public function setUp()
     {
-        $this->output = new WritableStream();
+        $stream = fopen('php://temp', 'r+');
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+
+        $this->output = new WritableResourceStream($stream, $loop);
         $this->encoder = new Encoder($this->output);
     }
 
