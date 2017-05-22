@@ -28,7 +28,7 @@ as parsed values instead of just chunks of strings:
 "hello w\u00f6rld"\r\n
 ```
 ```php
-$stdin = new Stream(STDIN, $loop);
+$stdin = new ReadableResourceStream(STDIN, $loop);
 
 $stream = new Decoder($stdin);
 
@@ -118,7 +118,7 @@ and accepts its data through the same interface, but handles any data as complet
 JSON elements instead of just chunks of strings:
 
 ```php
-$stdout = new Stream(STDOUT, $loop);
+$stdout = new WritableResourceStream(STDOUT, $loop);
 
 $stream = new Encoder($stdout);
 

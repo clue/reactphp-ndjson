@@ -1,7 +1,8 @@
 <?php
 
 use React\EventLoop\Factory;
-use React\Stream\Stream;
+use React\Stream\ReadableResourceStream;
+use React\Stream\WritableResourceStream;
 use Clue\React\NDJson\Decoder;
 use Clue\React\NDJson\Encoder;
 
@@ -10,11 +11,9 @@ require __DIR__ . '/../vendor/autoload.php';
 $loop = Factory::create();
 
 $exit = 0;
-$in = new Stream(STDIN, $loop);
-$out = new Stream(STDOUT, $loop);
-$out->pause();
-$info = new Stream(STDERR, $loop);
-$info->pause();
+$in = new ReadableResourceStream(STDIN, $loop);
+$out = new WritableResourceStream(STDOUT, $loop);
+$info = new WritableResourceStream(STDERR, $loop);
 
 $decoder = new Decoder($in);
 $encoder = new Encoder($out);
