@@ -48,6 +48,7 @@ class Encoder extends EventEmitter implements WritableStreamInterface
         }
 
         // we have to handle PHP warning for legacy PHP < 5.5 (see below)
+        // @codeCoverageIgnoreStart
         if (PHP_VERSION_ID < 50500) {
             $found = null;
             set_error_handler(function ($error) use (&$found) {
@@ -69,15 +70,16 @@ class Encoder extends EventEmitter implements WritableStreamInterface
 
             // emit an error event if a warning has been raised
             if ($found !== null) {
-                $this->emit('error', array(new \RuntimeException('Unable to encode JSON: ' . $found)));
-                return $this->close();
+                $this->handleError(new \RuntimeException('Unable to encode JSON: ' . $found));
+                return false;
             }
         }
+        // @codeCoverageIgnoreEnd
 
         // abort stream if encoding fails
         if ($data === false && json_last_error() !== JSON_ERROR_NONE) {
-            $this->emit('error', array(new \RuntimeException('Unable to encode JSON', json_last_error())));
-            return $this->close();
+            $this->handleError(new \RuntimeException('Unable to encode JSON', json_last_error()));
+            return false;
         }
 
         return $this->output->write($data . "\n");

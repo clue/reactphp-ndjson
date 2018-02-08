@@ -35,9 +35,10 @@ class EncoderTest extends TestCase
         $this->output->expects($this->once())->method('isWritable')->willReturn(true);
         $this->encoder = new Encoder($this->output);
 
-        $this->output->expects($this->once())->method('write')->with("\"hello\"\n");
+        $this->output->expects($this->once())->method('write')->with("\"hello\"\n")->willReturn(true);
 
-        $this->encoder->write('hello');
+        $ret = $this->encoder->write('hello');
+        $this->assertTrue($ret);
     }
 
     public function testWriteNull()
@@ -62,7 +63,8 @@ class EncoderTest extends TestCase
         $this->encoder->on('error', $this->expectCallableOnce());
         $this->encoder->on('close', $this->expectCallableOnce());
 
-        $this->encoder->write(INF);
+        $ret = $this->encoder->write(INF);
+        $this->assertFalse($ret);
 
         $this->assertFalse($this->encoder->isWritable());
     }
