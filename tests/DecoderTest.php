@@ -62,6 +62,35 @@ class DecoderTest extends TestCase
         $this->input->emit('data', array("invalid\n"));
     }
 
+    public function testEmitDataOverflowWillForwardError()
+    {
+        $this->decoder->on('data', $this->expectCallableNever());
+        $this->decoder->on('error', $this->expectCallableOnce());
+
+        $this->input->emit('data', array("\"" . str_repeat(".", 40000)));
+        $this->input->emit('data', array(str_repeat(".", 40000) . "\"\n"));
+    }
+
+    public function testEmitDataWithExactLimitWillForward()
+    {
+        $this->decoder = new Decoder($this->input, false, 512, 0, 4);
+
+        $this->decoder->on('data', $this->expectCallableOnceWith(null));
+        $this->decoder->on('error', $this->expectCallableNever());
+
+        $this->input->emit('data', array("null\n"));
+    }
+
+    public function testEmitDataOverflowBehindExactLimitWillForwardError()
+    {
+        $this->decoder = new Decoder($this->input, false, 512, 0, 3);
+
+        $this->decoder->on('data', $this->expectCallableNever());
+        $this->decoder->on('error', $this->expectCallableOnce());
+
+        $this->input->emit('data', array("null"));
+    }
+
     public function testEmitDataErrorWithoutNewlineWillNotForward()
     {
         $this->decoder->on('data', $this->expectCallableNever());

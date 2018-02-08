@@ -45,7 +45,7 @@ These chunks do not necessarily represent complete JSON elements, as an
 element may be broken up into multiple chunks.
 This class reassembles these elements by buffering incomplete ones.
 
-The `Decoder` supports the same parameters as the underlying
+The `Decoder` supports the same optional parameters as the underlying
 [`json_decode()`](http://php.net/json_decode) function.
 This means that, by default, JSON objects will be emitted as a `stdClass`.
 This behavior can be controlled through the optional constructor parameters:
@@ -56,6 +56,16 @@ $stream = new Decoder($stdin, true);
 $stream->on('data', function ($data) {
     // JSON objects will be emitted as assoc arrays now
 });
+```
+
+Additionally, the `Decoder` limits the maximum buffer size (maximum line
+length) to avoid buffer overflows due to malformed user input. Usually, there
+should be no need to change this value, unless you know you're dealing with some
+unreasonably long lines. It accepts an additional argument if you want to change
+this from the default of 64 KiB:
+
+```php
+$stream = new Decoder($stdin, false, 512, 0, 64 * 1024);
 ```
 
 If the underlying stream emits an `error` event or the plain stream contains

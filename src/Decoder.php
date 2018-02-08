@@ -16,11 +16,12 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
     private $assoc;
     private $depth;
     private $options;
+    private $maxlength;
 
     private $buffer = '';
     private $closed = false;
 
-    public function __construct(ReadableStreamInterface $input, $assoc = false, $depth = 512, $options = 0)
+    public function __construct(ReadableStreamInterface $input, $assoc = false, $depth = 512, $options = 0, $maxlength = 65536)
     {
         // @codeCoverageIgnoreStart
         if ($options !== 0 && PHP_VERSION < 5.4) {
@@ -37,6 +38,7 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
         $this->assoc = $assoc;
         $this->depth = $depth;
         $this->options = $options;
+        $this->maxlength = $maxlength;
 
         $this->input->on('data', array($this, 'handleData'));
         $this->input->on('end', array($this, 'handleEnd'));
@@ -87,25 +89,30 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
         $this->buffer .= $data;
 
         // keep parsing while a newline has been found
-        while (($newline = strpos($this->buffer, "\n")) !== false) {
+        while (($newline = strpos($this->buffer, "\n")) !== false && $newline <= $this->maxlength) {
             // read data up until newline and remove from buffer
             $data = (string)substr($this->buffer, 0, $newline);
             $this->buffer = (string)substr($this->buffer, $newline + 1);
 
             // decode data with options given in ctor
+            // @codeCoverageIgnoreStart
             if ($this->options === 0) {
                 $data = json_decode($data, $this->assoc, $this->depth);
             } else {
                 $data = json_decode($data, $this->assoc, $this->depth, $this->options);
             }
+            // @codeCoverageIgnoreEnd
 
             // abort stream if decoding failed
             if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
-                $this->emit('error', array(new \RuntimeException('Unable to decode JSON', json_last_error())));
-                return $this->close();
+                return $this->handleError(new \RuntimeException('Unable to decode JSON', json_last_error()));
             }
 
             $this->emit('data', array($data));
+        }
+
+        if (isset($this->buffer[$this->maxlength])) {
+            $this->handleError(new \OverflowException('Buffer size exceeded'));
         }
     }
 
