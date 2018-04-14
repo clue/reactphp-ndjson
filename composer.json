@@ -19,7 +19,7 @@
     },
     "require-dev": {
         "react/event-loop": " ^0.4 || ^0.3",
-        "phpunit/phpunit": "^5.0 || ^4.8",
+        "phpunit/phpunit": "^6.0 || ^5.7 || ^4.8.35",
         "react/stream": "^1.0 || ^0.7 || ^0.6"
     }
 }
