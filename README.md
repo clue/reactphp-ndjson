@@ -200,7 +200,8 @@ See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
 
 ## Tests
 
-To run the test suite, you first need to clone this repo and then install all dependencies [through Composer](http://getcomposer.org):
+To run the test suite, you first need to clone this repo and then install all
+dependencies [through Composer](http://getcomposer.org):
 
 ```bash
 $ composer install
