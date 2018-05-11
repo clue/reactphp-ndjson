@@ -1,4 +1,4 @@
-# clue/ndjson-react [![Build Status](https://travis-ci.org/clue/php-ndjson-react.svg?branch=master)](https://travis-ci.org/clue/php-ndjson-react)
+# clue/reactphp-ndjson [![Build Status](https://travis-ci.org/clue/reactphp-ndjson.svg?branch=master)](https://travis-ci.org/clue/reactphp-ndjson)
 
 Streaming newline delimited JSON ([NDJSON](http://ndjson.org/)) parser and encoder, built on top of React PHP
 
@@ -233,10 +233,10 @@ MIT
   the underlying [react/stream](https://github.com/reactphp/stream) component.
 
 * If you want to process compressed NDJSON files (`.ndjson.gz` file extension)
-  you may want to use [clue/zlib-react](https://github.com/clue/php-zlib-react)
+  you may want to use [clue/reactphp-zlib](https://github.com/clue/reactphp-zlib)
   on the compressed input stream before passing the decompressed stream to the NDJSON decoder.
 
 * If you want to create compressed NDJSON files (`.ndjson.gz` file extension)
-  you may want to use [clue/zlib-react](https://github.com/clue/php-zlib-react)
+  you may want to use [clue/reactphp-zlib](https://github.com/clue/reactphp-zlib)
   on the resulting NDJSON encoder output stream before passing the compressed
   stream to the file output stream.
