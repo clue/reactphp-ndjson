@@ -1,6 +1,6 @@
 # clue/reactphp-ndjson [![Build Status](https://travis-ci.org/clue/reactphp-ndjson.svg?branch=master)](https://travis-ci.org/clue/reactphp-ndjson)
 
-Streaming newline delimited JSON ([NDJSON](http://ndjson.org/)) parser and encoder, built on top of React PHP
+Streaming newline delimited JSON ([NDJSON](http://ndjson.org/)) parser and encoder for ReactPHP.
 
 **Table of Contents**
 
@@ -24,23 +24,24 @@ and exposes its data through the same interface, but emits the JSON elements
 as parsed values instead of just chunks of strings:
 
 ```
-{"name":"test","active":true}\r\n
-"hello w\u00f6rld"\r\n
+{"name":"test","active":true}
+{"name":"hello w\u00f6rld","active":true}
 ```
+
 ```php
 $stdin = new ReadableResourceStream(STDIN, $loop);
 
 $stream = new Decoder($stdin);
 
 $stream->on('data', function ($data) {
-    // data is a parsed element form the JSON stream
+    // data is a parsed element from the JSON stream
     // line 1: $data = (object)array('name' => 'test', 'active' => true);
-    // line 2: $data = "hello wörld";
+    // line 2: $data = (object)array('name' => 'hello wörld', 'active' => true);
     var_dump($data);
 });
 ```
 
-React's streams emit chunks of data strings and make no assumption about their lengths.
+ReactPHP's streams emit chunks of data strings and make no assumption about their lengths.
 These chunks do not necessarily represent complete JSON elements, as an
 element may be broken up into multiple chunks.
 This class reassembles these elements by buffering incomplete ones.
@@ -115,7 +116,7 @@ Please note that the `Decoder` emits decoded/parsed data events, while many
 $stream->pipe($logger);
 ```
 
-For more details, see React's
+For more details, see ReactPHP's
 [`ReadableStreamInterface`](https://github.com/reactphp/stream#readablestreaminterface).
 
 ### Encoder
@@ -133,11 +134,11 @@ $stdout = new WritableResourceStream(STDOUT, $loop);
 $stream = new Encoder($stdout);
 
 $stream->write(array('name' => 'test', 'active' => true));
-$stream->write('hello wörld');
+$stream->write(array('name' => 'hello wörld', 'active' => true));
 ```
 ```
-{"name":"test","active":true}\r\n
-"hello w\u00f6rld"\r\n
+{"name":"test","active":true}
+{"name":"hello w\u00f6rld","active":true}
 ```
 
 The `Encoder` supports the same parameters as the underlying
@@ -151,13 +152,13 @@ $stream = new Encoder($stdout, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 $stream->write('hello wörld');
 ```
 ```
-"hello wörld"\r\n
+"hello wörld"
 ```
 
 Note that trying to pass the `JSON_PRETTY_PRINT` option will yield an
 `InvalidArgumentException` because it is not compatible with NDJSON.
 
-If the underlying stream emits an `error` event or the given datacontains
+If the underlying stream emits an `error` event or the given data contains
 any data that can not be represented as a valid NDJSON stream,
 it will emit an `error` event and then `close` the input stream:
 
@@ -191,9 +192,8 @@ its underlying stream:
 $stream->close();
 ```
 
-For more details, see React's
+For more details, see ReactPHP's
 [`WritableStreamInterface`](https://github.com/reactphp/stream#writablestreaminterface).
-
 
 ## Install
 
@@ -203,7 +203,7 @@ The recommended way to install this library is [through Composer](https://getcom
 This will install the latest supported version:
 
 ```bash
-$ composer require clue/ndjson-react:^0.1.1
+$ composer require clue/ndjson-react:^0.1.2
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
