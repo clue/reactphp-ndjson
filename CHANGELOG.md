@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0 (2018-05-17)
+
+*   First stable release, now following SemVer
+
+*   Improve documentation and usage examples
+
+> Contains no other changes, so it's actually fully compatible with the v0.1.2 release.
+
 ## 0.1.2 (2018-05-11)
 
 *   Feature: Limit buffer size to 64 KiB by default.

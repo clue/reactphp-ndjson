@@ -1,6 +1,6 @@
 {
     "name": "clue/ndjson-react",
-    "description": "Streaming newline delimited JSON (NDJSON) parser, built on top of React PHP",
+    "description": "Streaming newline-delimited JSON (NDJSON) parser and encoder for ReactPHP.",
     "keywords": ["NDJSON", "newline", "JSON", "jsonlines", "streaming", "ReactPHP"],
     "homepage": "https://github.com/clue/reactphp-ndjson",
     "license": "MIT",
