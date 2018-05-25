@@ -47,25 +47,18 @@ class Encoder extends EventEmitter implements WritableStreamInterface
             return false;
         }
 
-        // we have to handle PHP warning for legacy PHP < 5.5 (see below)
+        // we have to handle PHP warnings for legacy PHP < 5.5
+        // certain values (such as INF etc.) emit a warning, but still encode successfully
         // @codeCoverageIgnoreStart
         if (PHP_VERSION_ID < 50500) {
             $found = null;
             set_error_handler(function ($error) use (&$found) {
                 $found = $error;
             });
-        }
 
-        // encode data with options given in ctor
-        if ($this->depth === 512) {
+            // encode data with options given in ctor (depth not supported)
             $data = json_encode($data, $this->options);
-        } else {
-            $data = json_encode($data, $this->options, $this->depth);
-        }
 
-        // legacy error handler for PHP < 5.5
-        // certain values (such as INF etc.) emit a warning, but still encode successfully
-        if (PHP_VERSION_ID < 50500) {
             restore_error_handler();
 
             // emit an error event if a warning has been raised
@@ -73,6 +66,9 @@ class Encoder extends EventEmitter implements WritableStreamInterface
                 $this->handleError(new \RuntimeException('Unable to encode JSON: ' . $found));
                 return false;
             }
+        } else {
+            // encode data with options given in ctor
+            $data = json_encode($data, $this->options, $this->depth);
         }
         // @codeCoverageIgnoreEnd
 
