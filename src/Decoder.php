@@ -16,11 +16,20 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
     private $assoc;
     private $depth;
     private $options;
+    /** @var int */
     private $maxlength;
 
     private $buffer = '';
     private $closed = false;
 
+    /**
+     * @param ReadableStreamInterface $input
+     * @param bool $assoc
+     * @param int $depth
+     * @param int $options (requires PHP 5.4+)
+     * @param int $maxlength
+     * @throws \BadMethodCallException
+     */
     public function __construct(ReadableStreamInterface $input, $assoc = false, $depth = 512, $options = 0, $maxlength = 65536)
     {
         // @codeCoverageIgnoreStart
@@ -35,7 +44,8 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
         $this->input = $input;
 
         if (!$input->isReadable()) {
-            return $this->close();
+            $this->close();
+            return;
         }
 
         $this->assoc = $assoc;
