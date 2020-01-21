@@ -1,7 +1,7 @@
 <?php
 
-use React\Stream\ReadableResourceStream;
 use Clue\React\NDJson\Decoder;
+use React\Stream\ThroughStream;
 
 class DecoderTest extends TestCase
 {
@@ -10,10 +10,7 @@ class DecoderTest extends TestCase
 
     public function setUp()
     {
-        $stream = fopen('php://temp', 'r');
-        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
-
-        $this->input = new ReadableResourceStream($stream, $loop);
+        $this->input = new ThroughStream();
         $this->decoder = new Decoder($this->input);
     }
 
@@ -56,6 +53,21 @@ class DecoderTest extends TestCase
 
     public function testEmitDataErrorWillForwardError()
     {
+        $this->decoder->on('data', $this->expectCallableNever());
+        $this->decoder->on('error', $this->expectCallableOnce());
+
+        $this->input->emit('data', array("invalid\n"));
+    }
+
+    public function testEmitDataErrorWillForwardErrorAlsoWhenCreatedWithThrowOnError()
+    {
+        if (!defined('JSON_THROW_ON_ERROR')) {
+            $this->markTestSkipped('Const JSON_THROW_ON_ERROR only available in PHP 7.3+');
+        }
+
+        $this->input = new ThroughStream();
+        $this->decoder = new Decoder($this->input, false, 512, JSON_THROW_ON_ERROR);
+
         $this->decoder->on('data', $this->expectCallableNever());
         $this->decoder->on('error', $this->expectCallableOnce());
 

@@ -69,6 +69,27 @@ class EncoderTest extends TestCase
         $this->assertFalse($this->encoder->isWritable());
     }
 
+    public function testWriteInfiniteWillEmitErrorAndCloseAlsoWhenCreatedWithThrowOnError()
+    {
+        if (!defined('JSON_THROW_ON_ERROR')) {
+            $this->markTestSkipped('Const JSON_THROW_ON_ERROR only available in PHP 7.3+');
+        }
+
+        $this->output = $this->getMockBuilder('React\Stream\WritableStreamInterface')->getMock();
+        $this->output->expects($this->once())->method('isWritable')->willReturn(true);
+        $this->encoder = new Encoder($this->output, JSON_THROW_ON_ERROR);
+
+        $this->output->expects($this->never())->method('write');
+
+        $this->encoder->on('error', $this->expectCallableOnce());
+        $this->encoder->on('close', $this->expectCallableOnce());
+
+        $ret = $this->encoder->write(INF);
+        $this->assertFalse($ret);
+
+        $this->assertFalse($this->encoder->isWritable());
+    }
+
     public function testEndWithoutDataWillEndOutputWithoutData()
     {
         $this->output = $this->getMockBuilder('React\Stream\WritableStreamInterface')->getMock();

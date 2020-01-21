@@ -25,6 +25,9 @@ class Encoder extends EventEmitter implements WritableStreamInterface
         if ($depth !== 512 && PHP_VERSION < 5.5) {
             throw new \BadMethodCallException('Depth parameter is only supported on PHP 5.5+');
         }
+        if (defined('JSON_THROW_ON_ERROR')) {
+            $options = $options & ~JSON_THROW_ON_ERROR;
+        }
         // @codeCoverageIgnoreEnd
 
         $this->output = $output;

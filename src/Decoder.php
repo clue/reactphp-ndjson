@@ -27,6 +27,9 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
         if ($options !== 0 && PHP_VERSION < 5.4) {
             throw new \BadMethodCallException('Options parameter is only supported on PHP 5.4+');
         }
+        if (defined('JSON_THROW_ON_ERROR')) {
+            $options = $options & ~JSON_THROW_ON_ERROR;
+        }
         // @codeCoverageIgnoreEnd
 
         $this->input = $input;
