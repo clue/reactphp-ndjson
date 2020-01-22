@@ -1,7 +1,7 @@
 <?php
 
-use React\Stream\ReadableResourceStream;
 use Clue\React\NDJson\Decoder;
+use React\Stream\ThroughStream;
 
 class DecoderTest extends TestCase
 {
@@ -10,10 +10,7 @@ class DecoderTest extends TestCase
 
     public function setUp()
     {
-        $stream = fopen('php://temp', 'r');
-        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
-
-        $this->input = new ReadableResourceStream($stream, $loop);
+        $this->input = new ThroughStream();
         $this->decoder = new Decoder($this->input);
     }
 
@@ -54,8 +51,42 @@ class DecoderTest extends TestCase
         $this->input->emit('data', array("\n"));
     }
 
+    public function testEmitDataBigIntOptionWillForwardAsString()
+    {
+        if (!defined('JSON_BIGINT_AS_STRING')) {
+            $this->markTestSkipped('Const JSON_BIGINT_AS_STRING only available in PHP 5.4+');
+        }
+        $this->decoder = new Decoder($this->input, false, 512, JSON_BIGINT_AS_STRING);
+        $this->decoder->on('data', $this->expectCallableOnceWith($this->identicalTo('999888777666555444333222111000')));
+
+        $this->input->emit('data', array("999888777666555444333222111000\n"));
+    }
+
     public function testEmitDataErrorWillForwardError()
     {
+        $this->decoder->on('data', $this->expectCallableNever());
+        $error = null;
+        $this->decoder->on('error', function ($e) use (&$error) {
+            $error = $e;
+        });
+        $this->decoder->on('error', $this->expectCallableOnce());
+
+        $this->input->emit('data', array("invalid\n"));
+
+        $this->assertInstanceOf('RuntimeException', $error);
+        $this->assertContains('Syntax error', $error->getMessage());
+        $this->assertEquals(JSON_ERROR_SYNTAX, $error->getCode());
+    }
+
+    public function testEmitDataErrorWillForwardErrorAlsoWhenCreatedWithThrowOnError()
+    {
+        if (!defined('JSON_THROW_ON_ERROR')) {
+            $this->markTestSkipped('Const JSON_THROW_ON_ERROR only available in PHP 7.3+');
+        }
+
+        $this->input = new ThroughStream();
+        $this->decoder = new Decoder($this->input, false, 512, JSON_THROW_ON_ERROR);
+
         $this->decoder->on('data', $this->expectCallableNever());
         $this->decoder->on('error', $this->expectCallableOnce());
 

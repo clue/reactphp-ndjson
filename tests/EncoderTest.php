@@ -60,6 +60,74 @@ class EncoderTest extends TestCase
 
         $this->output->expects($this->never())->method('write');
 
+        $error = null;
+        $this->encoder->on('error', function ($e) use (&$error) {
+            $error = $e;
+        });
+        $this->encoder->on('error', $this->expectCallableOnce());
+        $this->encoder->on('close', $this->expectCallableOnce());
+
+        $ret = $this->encoder->write(INF);
+        $this->assertFalse($ret);
+
+        $this->assertFalse($this->encoder->isWritable());
+
+        $this->assertInstanceOf('RuntimeException', $error);
+        if (PHP_VERSION_ID >= 50500) {
+            // PHP 5.5+ reports error with proper code
+            $this->assertContains('Inf and NaN cannot be JSON encoded', $error->getMessage());
+            $this->assertEquals(JSON_ERROR_INF_OR_NAN, $error->getCode());
+        } else {
+            // PHP < 5.5 reports error message without code
+            $this->assertContains('double INF does not conform to the JSON spec', $error->getMessage());
+            $this->assertEquals(0, $error->getCode());
+        }
+    }
+
+    public function testWriteInvalidUtf8WillEmitErrorAndClose()
+    {
+        $this->output = $this->getMockBuilder('React\Stream\WritableStreamInterface')->getMock();
+        $this->output->expects($this->once())->method('isWritable')->willReturn(true);
+        $this->encoder = new Encoder($this->output);
+
+        $this->output->expects($this->never())->method('write');
+
+        $error = null;
+        $this->encoder->on('error', function ($e) use (&$error) {
+            $error = $e;
+        });
+        $this->encoder->on('error', $this->expectCallableOnce());
+        $this->encoder->on('close', $this->expectCallableOnce());
+
+        $ret = $this->encoder->write("\xfe");
+        $this->assertFalse($ret);
+
+        $this->assertFalse($this->encoder->isWritable());
+
+        $this->assertInstanceOf('RuntimeException', $error);
+        if (PHP_VERSION_ID >= 50500) {
+            // PHP 5.5+ reports error with proper code
+            $this->assertContains('Malformed UTF-8 characters, possibly incorrectly encoded', $error->getMessage());
+            $this->assertEquals(JSON_ERROR_UTF8, $error->getCode());
+        } elseif (PHP_VERSION_ID >= 50303) {
+            // PHP 5.3.3+ reports error with proper code (const JSON_ERROR_UTF8 added in PHP 5.3.3)
+            $this->assertContains('Malformed UTF-8 characters, possibly incorrectly encoded', $error->getMessage());
+            $this->assertEquals(JSON_ERROR_UTF8, $error->getCode());
+        }
+    }
+
+    public function testWriteInfiniteWillEmitErrorAndCloseAlsoWhenCreatedWithThrowOnError()
+    {
+        if (!defined('JSON_THROW_ON_ERROR')) {
+            $this->markTestSkipped('Const JSON_THROW_ON_ERROR only available in PHP 7.3+');
+        }
+
+        $this->output = $this->getMockBuilder('React\Stream\WritableStreamInterface')->getMock();
+        $this->output->expects($this->once())->method('isWritable')->willReturn(true);
+        $this->encoder = new Encoder($this->output, JSON_THROW_ON_ERROR);
+
+        $this->output->expects($this->never())->method('write');
+
         $this->encoder->on('error', $this->expectCallableOnce());
         $this->encoder->on('close', $this->expectCallableOnce());
 

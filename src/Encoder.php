@@ -25,6 +25,9 @@ class Encoder extends EventEmitter implements WritableStreamInterface
         if ($depth !== 512 && PHP_VERSION < 5.5) {
             throw new \BadMethodCallException('Depth parameter is only supported on PHP 5.5+');
         }
+        if (defined('JSON_THROW_ON_ERROR')) {
+            $options = $options & ~JSON_THROW_ON_ERROR;
+        }
         // @codeCoverageIgnoreEnd
 
         $this->output = $output;
@@ -47,40 +50,46 @@ class Encoder extends EventEmitter implements WritableStreamInterface
             return false;
         }
 
-        // we have to handle PHP warning for legacy PHP < 5.5 (see below)
+        // we have to handle PHP warnings for legacy PHP < 5.5
+        // certain values (such as INF etc.) emit a warning, but still encode successfully
         // @codeCoverageIgnoreStart
         if (PHP_VERSION_ID < 50500) {
-            $found = null;
-            set_error_handler(function ($error) use (&$found) {
-                $found = $error;
+            $errstr = null;
+            set_error_handler(function ($_, $error) use (&$errstr) {
+                $errstr = $error;
             });
-        }
 
-        // encode data with options given in ctor
-        if ($this->depth === 512) {
+            // encode data with options given in ctor (depth not supported)
             $data = json_encode($data, $this->options);
-        } else {
-            $data = json_encode($data, $this->options, $this->depth);
-        }
 
-        // legacy error handler for PHP < 5.5
-        // certain values (such as INF etc.) emit a warning, but still encode successfully
-        if (PHP_VERSION_ID < 50500) {
+            // always check error code and match missing error messages
             restore_error_handler();
+            $errno = json_last_error();
+            if (defined('JSON_ERROR_UTF8') && $errno === JSON_ERROR_UTF8) {
+                // const JSON_ERROR_UTF8 added in PHP 5.3.3, but no error message assigned in legacy PHP < 5.5
+                // this overrides PHP 5.3.14 only: https://3v4l.org/IGP8Z#v5314
+                $errstr = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+            } elseif ($errno !== JSON_ERROR_NONE && $errstr === null) {
+                // error number present, but no error message applicable
+                $errstr = 'Unknown error';
+            }
 
-            // emit an error event if a warning has been raised
-            if ($found !== null) {
-                $this->handleError(new \RuntimeException('Unable to encode JSON: ' . $found));
+            // abort stream if encoding fails
+            if ($errno !== JSON_ERROR_NONE || $errstr !== null) {
+                $this->handleError(new \RuntimeException('Unable to encode JSON: ' . $errstr, $errno));
+                return false;
+            }
+        } else {
+            // encode data with options given in ctor
+            $data = json_encode($data, $this->options, $this->depth);
+
+            // abort stream if encoding fails
+            if ($data === false && json_last_error() !== JSON_ERROR_NONE) {
+                $this->handleError(new \RuntimeException('Unable to encode JSON: ' . json_last_error_msg(), json_last_error()));
                 return false;
             }
         }
         // @codeCoverageIgnoreEnd
-
-        // abort stream if encoding fails
-        if ($data === false && json_last_error() !== JSON_ERROR_NONE) {
-            $this->handleError(new \RuntimeException('Unable to encode JSON', json_last_error()));
-            return false;
-        }
 
         return $this->output->write($data . "\n");
     }

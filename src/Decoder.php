@@ -27,6 +27,9 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
         if ($options !== 0 && PHP_VERSION < 5.4) {
             throw new \BadMethodCallException('Options parameter is only supported on PHP 5.4+');
         }
+        if (defined('JSON_THROW_ON_ERROR')) {
+            $options = $options & ~JSON_THROW_ON_ERROR;
+        }
         // @codeCoverageIgnoreEnd
 
         $this->input = $input;
@@ -95,17 +98,24 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
             $this->buffer = (string)substr($this->buffer, $newline + 1);
 
             // decode data with options given in ctor
-            // @codeCoverageIgnoreStart
             if ($this->options === 0) {
                 $data = json_decode($data, $this->assoc, $this->depth);
             } else {
                 $data = json_decode($data, $this->assoc, $this->depth, $this->options);
             }
-            // @codeCoverageIgnoreEnd
 
             // abort stream if decoding failed
             if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
-                return $this->handleError(new \RuntimeException('Unable to decode JSON', json_last_error()));
+                // @codeCoverageIgnoreStart
+                if (PHP_VERSION_ID > 50500) {
+                    $errstr = json_last_error_msg();
+                } elseif (json_last_error() === JSON_ERROR_SYNTAX) {
+                    $errstr = 'Syntax error';
+                } else {
+                    $errstr = 'Unknown error';
+                }
+                // @codeCoverageIgnoreEnd
+                return $this->handleError(new \RuntimeException('Unable to decode JSON: ' . $errstr, json_last_error()));
             }
 
             $this->emit('data', array($data));
