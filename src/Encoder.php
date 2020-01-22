@@ -16,6 +16,13 @@ class Encoder extends EventEmitter implements WritableStreamInterface
 
     private $closed = false;
 
+    /**
+     * @param WritableStreamInterface $output
+     * @param int $options
+     * @param int $depth (requires PHP 5.5+)
+     * @throws \InvalidArgumentException
+     * @throws \BadMethodCallException
+     */
     public function __construct(WritableStreamInterface $output, $options = 0, $depth = 512)
     {
         // @codeCoverageIgnoreStart
@@ -33,7 +40,8 @@ class Encoder extends EventEmitter implements WritableStreamInterface
         $this->output = $output;
 
         if (!$output->isWritable()) {
-            return $this->close();
+            $this->close();
+            return;
         }
 
         $this->options = $options;
