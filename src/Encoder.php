@@ -26,14 +26,14 @@ class Encoder extends EventEmitter implements WritableStreamInterface
     public function __construct(WritableStreamInterface $output, $options = 0, $depth = 512)
     {
         // @codeCoverageIgnoreStart
-        if (defined('JSON_PRETTY_PRINT') && $options & JSON_PRETTY_PRINT) {
+        if (\defined('JSON_PRETTY_PRINT') && $options & \JSON_PRETTY_PRINT) {
             throw new \InvalidArgumentException('Pretty printing not available for NDJSON');
         }
-        if ($depth !== 512 && PHP_VERSION < 5.5) {
+        if ($depth !== 512 && \PHP_VERSION < 5.5) {
             throw new \BadMethodCallException('Depth parameter is only supported on PHP 5.5+');
         }
-        if (defined('JSON_THROW_ON_ERROR')) {
-            $options = $options & ~JSON_THROW_ON_ERROR;
+        if (\defined('JSON_THROW_ON_ERROR')) {
+            $options = $options & ~\JSON_THROW_ON_ERROR;
         }
         // @codeCoverageIgnoreEnd
 
@@ -61,39 +61,39 @@ class Encoder extends EventEmitter implements WritableStreamInterface
         // we have to handle PHP warnings for legacy PHP < 5.5
         // certain values (such as INF etc.) emit a warning, but still encode successfully
         // @codeCoverageIgnoreStart
-        if (PHP_VERSION_ID < 50500) {
+        if (\PHP_VERSION_ID < 50500) {
             $errstr = null;
-            set_error_handler(function ($_, $error) use (&$errstr) {
+            \set_error_handler(function ($_, $error) use (&$errstr) {
                 $errstr = $error;
             });
 
             // encode data with options given in ctor (depth not supported)
-            $data = json_encode($data, $this->options);
+            $data = \json_encode($data, $this->options);
 
             // always check error code and match missing error messages
-            restore_error_handler();
-            $errno = json_last_error();
-            if (defined('JSON_ERROR_UTF8') && $errno === JSON_ERROR_UTF8) {
+            \restore_error_handler();
+            $errno = \json_last_error();
+            if (\defined('JSON_ERROR_UTF8') && $errno === \JSON_ERROR_UTF8) {
                 // const JSON_ERROR_UTF8 added in PHP 5.3.3, but no error message assigned in legacy PHP < 5.5
                 // this overrides PHP 5.3.14 only: https://3v4l.org/IGP8Z#v5314
                 $errstr = 'Malformed UTF-8 characters, possibly incorrectly encoded';
-            } elseif ($errno !== JSON_ERROR_NONE && $errstr === null) {
+            } elseif ($errno !== \JSON_ERROR_NONE && $errstr === null) {
                 // error number present, but no error message applicable
                 $errstr = 'Unknown error';
             }
 
             // abort stream if encoding fails
-            if ($errno !== JSON_ERROR_NONE || $errstr !== null) {
+            if ($errno !== \JSON_ERROR_NONE || $errstr !== null) {
                 $this->handleError(new \RuntimeException('Unable to encode JSON: ' . $errstr, $errno));
                 return false;
             }
         } else {
             // encode data with options given in ctor
-            $data = json_encode($data, $this->options, $this->depth);
+            $data = \json_encode($data, $this->options, $this->depth);
 
             // abort stream if encoding fails
-            if ($data === false && json_last_error() !== JSON_ERROR_NONE) {
-                $this->handleError(new \RuntimeException('Unable to encode JSON: ' . json_last_error_msg(), json_last_error()));
+            if ($data === false && \json_last_error() !== \JSON_ERROR_NONE) {
+                $this->handleError(new \RuntimeException('Unable to encode JSON: ' . \json_last_error_msg(), \json_last_error()));
                 return false;
             }
         }

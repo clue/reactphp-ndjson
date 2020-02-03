@@ -4,8 +4,8 @@ namespace Clue\React\NDJson;
 
 use Evenement\EventEmitter;
 use React\Stream\ReadableStreamInterface;
-use React\Stream\WritableStreamInterface;
 use React\Stream\Util;
+use React\Stream\WritableStreamInterface;
 
 /**
  * The Decoder / Parser reads from a plain stream and emits data objects for each JSON element
@@ -33,11 +33,11 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
     public function __construct(ReadableStreamInterface $input, $assoc = false, $depth = 512, $options = 0, $maxlength = 65536)
     {
         // @codeCoverageIgnoreStart
-        if ($options !== 0 && PHP_VERSION < 5.4) {
+        if ($options !== 0 && \PHP_VERSION < 5.4) {
             throw new \BadMethodCallException('Options parameter is only supported on PHP 5.4+');
         }
-        if (defined('JSON_THROW_ON_ERROR')) {
-            $options = $options & ~JSON_THROW_ON_ERROR;
+        if (\defined('JSON_THROW_ON_ERROR')) {
+            $options = $options & ~\JSON_THROW_ON_ERROR;
         }
         // @codeCoverageIgnoreEnd
 
@@ -102,30 +102,30 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
         $this->buffer .= $data;
 
         // keep parsing while a newline has been found
-        while (($newline = strpos($this->buffer, "\n")) !== false && $newline <= $this->maxlength) {
+        while (($newline = \strpos($this->buffer, "\n")) !== false && $newline <= $this->maxlength) {
             // read data up until newline and remove from buffer
-            $data = (string)substr($this->buffer, 0, $newline);
-            $this->buffer = (string)substr($this->buffer, $newline + 1);
+            $data = (string)\substr($this->buffer, 0, $newline);
+            $this->buffer = (string)\substr($this->buffer, $newline + 1);
 
             // decode data with options given in ctor
             if ($this->options === 0) {
-                $data = json_decode($data, $this->assoc, $this->depth);
+                $data = \json_decode($data, $this->assoc, $this->depth);
             } else {
-                $data = json_decode($data, $this->assoc, $this->depth, $this->options);
+                $data = \json_decode($data, $this->assoc, $this->depth, $this->options);
             }
 
             // abort stream if decoding failed
-            if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
+            if ($data === null && \json_last_error() !== \JSON_ERROR_NONE) {
                 // @codeCoverageIgnoreStart
-                if (PHP_VERSION_ID > 50500) {
-                    $errstr = json_last_error_msg();
-                } elseif (json_last_error() === JSON_ERROR_SYNTAX) {
+                if (\PHP_VERSION_ID > 50500) {
+                    $errstr = \json_last_error_msg();
+                } elseif (\json_last_error() === \JSON_ERROR_SYNTAX) {
                     $errstr = 'Syntax error';
                 } else {
                     $errstr = 'Unknown error';
                 }
                 // @codeCoverageIgnoreEnd
-                return $this->handleError(new \RuntimeException('Unable to decode JSON: ' . $errstr, json_last_error()));
+                return $this->handleError(new \RuntimeException('Unable to decode JSON: ' . $errstr, \json_last_error()));
             }
 
             $this->emit('data', array($data));
