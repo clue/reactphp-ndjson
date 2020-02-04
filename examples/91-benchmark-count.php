@@ -1,5 +1,9 @@
 <?php
 
+// simple usage:
+// $ php examples/91-benchmark-count.php < examples/users.ndjson
+//
+// getting reasonable results requires a large data set:
 // 1) download a large CSV/TSV dataset, for example:
 // @link https://datasets.imdbws.com/
 // @link https://github.com/fivethirtyeight/russian-troll-tweets
@@ -8,7 +12,7 @@
 // @link https://github.com/clue/reactphp-csv/blob/v1.0.0/examples/11-csv2ndjson.php
 //
 // 3) pipe NDJSON into benchmark script:
-// $ examples/91-benchmark-count.php < title.ratings.ndjson
+// $ php examples/91-benchmark-count.php < title.ratings.ndjson
 
 use Clue\React\NDJson\Decoder;
 use React\EventLoop\Factory;

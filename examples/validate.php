@@ -1,5 +1,7 @@
 <?php
 
+// $ php examples/validate.php < examples/users.ndjson
+
 use React\EventLoop\Factory;
 use React\Stream\ReadableResourceStream;
 use React\Stream\WritableResourceStream;
