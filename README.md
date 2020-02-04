@@ -22,6 +22,7 @@ remote procedure call (RPC) mechanism.
 
 **Table of contents**
 
+* [NDJSON format](#ndjson-format)
 * [Usage](#usage)
   * [Decoder](#decoder)
   * [Encoder](#encoder)
@@ -29,6 +30,76 @@ remote procedure call (RPC) mechanism.
 * [Tests](#tests)
 * [License](#license)
 * [More](#more)
+
+## NDJSON format
+
+NDJSON ("Newline-Delimited JSON" or sometimes referred to as "JSON lines") is a
+very simple text-based format for storing a large number of records, such as a
+list of user records or log entries.
+
+```JSON
+{"name":"Alice","age":30,"comment":"Yes, I like cheese"}
+{"name":"Bob","age":50,"comment":"Hello\nWorld!"}
+```
+
+If you understand JSON and you're now looking at this newline-delimited JSON for
+the first time, you should already know everything you need to know to
+understand NDJSON: As the name implies, this format essentially consists of
+individual lines where each individual line is any valid JSON text and each line
+is delimited with a newline character.
+
+This example uses a list of user objects where each user has some arbitrary
+properties. This can easily be adjusted for many different use cases, such as
+storing for example products instead of users, assigning additional properties
+or having a significantly larger number of records. You can edit NDJSON files in
+any text editor or use them in a streaming context where individual records
+should be processed. Unlike normal JSON files, adding a new log entry to this
+NDJSON file does not require modification of this file's structure (note there's
+no "outer array" to be modified). This makes it a perfect fit for a streaming
+context, for line-oriented CLI tools (such as `grep` and others) or for a logging
+context where you want to append records at a later time. Additionally, this
+also allows it to be used in a streaming context, such as a simple inter-process
+commmunication (IPC) protocol or for a remote procedure call (RPC) mechanism.
+
+The newline character at the end of each line allows for some really simple
+*framing* (detecting individual records). While each individual line is valid
+JSON, the complete file as a whole is technically no longer valid JSON, because
+it contains multiple JSON texts. This implies that for example calling PHP's
+`json_decode()` on this complete input would fail because it would try to parse
+multiple records at once. Likewise, using "pretty printing" JSON
+(`JSON_PRETTY_PRINT`) is not allowed because each JSON text is limited to exactly
+one line. On the other hand, values containing newline characters (such as the
+`comment` property in the above example) do not cause issues because each newline
+within a JSON string will be represented by a `\n` instead.
+
+One common alternative to NDJSON would be Comma-Separated Values (CSV).
+If you want to process CSV files, you may want to take a look at the related
+project [clue/reactphp-csv](https://github.com/clue/reactphp-csv) instead:
+
+```
+name,age,comment
+Alice,30,"Yes, I like cheese"
+Bob,50,"Hello
+World!"
+```
+
+CSV may look slightly simpler, but this simplicity comes at a price. CSV is
+limited to untyped, two-dimensional data, so there's no standard way of storing
+any nested structures or to differentiate a boolean value from a string or
+integer. Field names are sometimes used, sometimes they're not
+(application-dependant). Inconsistent handling for fields that contain
+separators such as `,` or spaces or line breaks (see the `comment` field above)
+introduce additional complexity and its text encoding is usually undefined,
+Unicode (or UTF-8) is unlikely to be supported and CSV files often use ISO
+8859-1 encoding or some variant (again application-dependant).
+
+While NDJSON helps avoiding many of CVS's shortcomings, it is still a
+(relatively) young format while CSV files have been used in production systems
+for decades. This means that if you want to interface with an existing system,
+you may have to rely on the format that's already supported. If you're building
+a new system, using NDJSON is an excellent choice as it provides a flexible way
+to process individual records using a common text-based format that can include
+any kind of structured data.
 
 ## Usage
 
@@ -271,3 +342,7 @@ This project is released under the permissive [MIT license](LICENSE).
 * If you want to concurrently process the records from your NDJSON stream,
   you may want to use [clue/reactphp-flux](https://github.com/clue/reactphp-flux)
   to concurrently process many (but not too many) records at once.
+
+* If you want to process structured data in the more common text-based format,
+  you may want to use [clue/reactphp-csv](https://github.com/clue/reactphp-csv)
+  to process Comma-Separated-Values (CSV) files (`.csv` file extension).
