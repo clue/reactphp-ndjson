@@ -8,7 +8,9 @@ objects or log entries. It uses a simple newline character between each
 individual record and as such can be both used for efficient persistence and
 simple append-style operations. This also allows it to be used in a streaming
 context, such as a simple inter-process commmunication (IPC) protocol or for a
-remote procedure call (RPC) mechanism.
+remote procedure call (RPC) mechanism. This library provides a simple
+streaming API to process very large NDJSON files with thousands or even millions
+of rows efficiently without having to load the whole file into memory at once.
 
 * **Standard interfaces** -
   Allows easy integration with existing higher-level components by implementing
@@ -18,14 +20,14 @@ remote procedure call (RPC) mechanism.
   and does not get in your way.
   Builds on top of well-tested components and well-established concepts instead of reinventing the wheel.
 * **Good test coverage** -
-  Comes with an [automated tests suite](#tests) and is regularly tested in the *real world*
+  Comes with an [automated tests suite](#tests) and is regularly tested in the *real world*.
 
 **Table of contents**
 
 * [NDJSON format](#ndjson-format)
 * [Usage](#usage)
-  * [Decoder](#decoder)
-  * [Encoder](#encoder)
+    * [Decoder](#decoder)
+    * [Encoder](#encoder)
 * [Install](#install)
 * [Tests](#tests)
 * [License](#license)
@@ -136,7 +138,7 @@ element may be broken up into multiple chunks.
 This class reassembles these elements by buffering incomplete ones.
 
 The `Decoder` supports the same optional parameters as the underlying
-[`json_decode()`](http://php.net/json_decode) function.
+[`json_decode()`](https://www.php.net/manual/en/function.json-decode.php) function.
 This means that, by default, JSON objects will be emitted as a `stdClass`.
 This behavior can be controlled through the optional constructor parameters:
 
@@ -231,7 +233,7 @@ $stream->write(array('name' => 'hello wörld', 'active' => true));
 ```
 
 The `Encoder` supports the same parameters as the underlying
-[`json_encode()`](http://php.net/json_encode) function.
+[`json_encode()`](https://www.php.net/manual/en/function.json-encode.php) function.
 This means that, by default, unicode characters will be escaped in the output.
 This behavior can be controlled through the optional constructor parameters:
 
@@ -293,7 +295,7 @@ This project follows [SemVer](https://semver.org/).
 This will install the latest supported version:
 
 ```bash
-$ composer require clue/ndjson-react:^1.0
+$ composer require clue/ndjson-react:^1.1
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
