@@ -15,7 +15,7 @@
 
 *   Improve test suite to run tests on PHP 7.4 and simplify test matrix and
     apply minor code style adjustments to make phpstan happy.
-    (#13 and #16 by @clue)
+    (#13 and #15 by @clue)
 
 ## 1.0.0 (2018-05-17)
 
