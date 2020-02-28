@@ -95,7 +95,7 @@ introduce additional complexity and its text encoding is usually undefined,
 Unicode (or UTF-8) is unlikely to be supported and CSV files often use ISO
 8859-1 encoding or some variant (again application-dependant).
 
-While NDJSON helps avoiding many of CVS's shortcomings, it is still a
+While NDJSON helps avoiding many of CSV's shortcomings, it is still a
 (relatively) young format while CSV files have been used in production systems
 for decades. This means that if you want to interface with an existing system,
 you may have to rely on the format that's already supported. If you're building
