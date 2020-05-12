@@ -13,6 +13,9 @@
     "autoload": {
         "psr-4": { "Clue\\React\\NDJson\\": "src/" }
     },
+    "autoload-dev": {
+        "psr-4": { "Clue\\Tests\\React\\NDJson\\": "tests/" }
+    },
     "require": {
         "php": ">=5.3",
         "react/stream": "^1.0 || ^0.7 || ^0.6"

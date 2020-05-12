@@ -1,5 +1,7 @@
 <?php
 
+namespace Clue\Tests\React\NDJson;
+
 use React\Stream\WritableResourceStream;
 use Clue\React\NDJson\Encoder;
 

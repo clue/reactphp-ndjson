@@ -1,5 +1,7 @@
 <?php
 
+namespace Clue\Tests\React\NDJson;
+
 use Clue\React\NDJson\Decoder;
 use React\Stream\ThroughStream;
 
