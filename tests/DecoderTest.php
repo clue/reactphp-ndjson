@@ -10,7 +10,10 @@ class DecoderTest extends TestCase
     private $input;
     private $decoder;
 
-    public function setUp()
+    /**
+     * @before
+     */
+    public function setUpDecoder()
     {
         $this->input = new ThroughStream();
         $this->decoder = new Decoder($this->input);
@@ -76,7 +79,7 @@ class DecoderTest extends TestCase
         $this->input->emit('data', array("invalid\n"));
 
         $this->assertInstanceOf('RuntimeException', $error);
-        $this->assertContains('Syntax error', $error->getMessage());
+        $this->assertContainsString('Syntax error', $error->getMessage());
         $this->assertEquals(JSON_ERROR_SYNTAX, $error->getCode());
     }
 
