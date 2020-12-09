@@ -10,7 +10,10 @@ class EncoderTest extends TestCase
     private $output;
     private $encoder;
 
-    public function setUp()
+    /**
+     * @before
+     */
+    public function setUpEncoder()
     {
         $stream = fopen('php://temp', 'r+');
         $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
@@ -19,15 +22,13 @@ class EncoderTest extends TestCase
         $this->encoder = new Encoder($this->output);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testPrettyPrintDoesNotMakeSenseForNDJson()
     {
         if (!defined('JSON_PRETTY_PRINT')) {
             $this->markTestSkipped('Const JSON_PRETTY_PRINT only available in PHP 5.4+');
         }
 
+        $this->setExpectedException('InvalidArgumentException');
         $this->encoder = new Encoder($this->output, JSON_PRETTY_PRINT);
     }
 
@@ -77,11 +78,11 @@ class EncoderTest extends TestCase
         $this->assertInstanceOf('RuntimeException', $error);
         if (PHP_VERSION_ID >= 50500) {
             // PHP 5.5+ reports error with proper code
-            $this->assertContains('Inf and NaN cannot be JSON encoded', $error->getMessage());
+            $this->assertContainsString('Inf and NaN cannot be JSON encoded', $error->getMessage());
             $this->assertEquals(JSON_ERROR_INF_OR_NAN, $error->getCode());
         } else {
             // PHP < 5.5 reports error message without code
-            $this->assertContains('double INF does not conform to the JSON spec', $error->getMessage());
+            $this->assertContainsString('double INF does not conform to the JSON spec', $error->getMessage());
             $this->assertEquals(0, $error->getCode());
         }
     }
@@ -109,7 +110,7 @@ class EncoderTest extends TestCase
         $this->assertInstanceOf('RuntimeException', $error);
         if (PHP_VERSION_ID >= 50500) {
             // PHP 5.5+ reports error with proper code
-            $this->assertContains('Malformed UTF-8 characters, possibly incorrectly encoded', $error->getMessage());
+            $this->assertContainsString('Malformed UTF-8 characters, possibly incorrectly encoded', $error->getMessage());
             $this->assertEquals(JSON_ERROR_UTF8, $error->getCode());
         } elseif (PHP_VERSION_ID >= 50303) {
             // PHP 5.3.3+ reports error with proper code (const JSON_ERROR_UTF8 added in PHP 5.3.3)
