@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 (2020-12-09)
+
+*   Improve test suite and add `.gitattributes` to exclude dev files from exports.
+    Add PHP 8 support, update to PHPUnit 9 and simplify test setup.
+    (#18 by @clue and #19, #22 and #23 by @SimonFrings)
+
 ## 1.1.0 (2020-02-04)
 
 *   Feature: Improve error reporting and add parsing error message to Exception and
