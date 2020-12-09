@@ -1,4 +1,6 @@
-# clue/reactphp-ndjson [![Build Status](https://travis-ci.org/clue/reactphp-ndjson.svg?branch=master)](https://travis-ci.org/clue/reactphp-ndjson)
+# clue/reactphp-ndjson
+
+[![CI status](https://github.com/clue/reactphp-ndjson/workflows/CI/badge.svg)](https://github.com/clue/reactphp-ndjson/actions)
 
 Streaming newline-delimited JSON ([NDJSON](http://ndjson.org/)) parser and encoder for [ReactPHP](https://reactphp.org/).
 
