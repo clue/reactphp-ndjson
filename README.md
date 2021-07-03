@@ -1,6 +1,7 @@
 # clue/reactphp-ndjson
 
 [![CI status](https://github.com/clue/reactphp-ndjson/workflows/CI/badge.svg)](https://github.com/clue/reactphp-ndjson/actions)
+[![installs on Packagist](https://img.shields.io/packagist/dt/clue/ndjson-react?color=blue&label=installs%20on%20Packagist)](https://packagist.org/packages/clue/ndjson-react)
 
 Streaming newline-delimited JSON ([NDJSON](http://ndjson.org/)) parser and encoder for [ReactPHP](https://reactphp.org/).
 
