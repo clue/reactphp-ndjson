@@ -15,7 +15,7 @@
 // $ php examples/91-benchmark-count.php < title.ratings.ndjson
 
 use Clue\React\NDJson\Decoder;
-use React\EventLoop\Factory;
+use React\EventLoop\Loop;
 use React\Stream\ReadableResourceStream;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -24,8 +24,7 @@ if (extension_loaded('xdebug')) {
     echo 'NOTICE: The "xdebug" extension is loaded, this has a major impact on performance.' . PHP_EOL;
 }
 
-$loop = Factory::create();
-$decoder = new Decoder(new ReadableResourceStream(STDIN, $loop), true);
+$decoder = new Decoder(new ReadableResourceStream(STDIN), true);
 
 $count = 0;
 $decoder->on('data', function () use (&$count) {
@@ -33,15 +32,13 @@ $decoder->on('data', function () use (&$count) {
 });
 
 $start = microtime(true);
-$report = $loop->addPeriodicTimer(0.05, function () use (&$count, $start) {
+$report = Loop::addPeriodicTimer(0.05, function () use (&$count, $start) {
     printf("\r%d records in %0.3fs...", $count, microtime(true) - $start);
 });
 
-$decoder->on('close', function () use (&$count, $report, $loop, $start) {
+$decoder->on('close', function () use (&$count, $report, $start) {
     $now = microtime(true);
-    $loop->cancelTimer($report);
+    Loop::cancelTimer($report);
 
     printf("\r%d records in %0.3fs => %d records/s\n", $count, $now - $start, $count / ($now - $start));
 });
-
-$loop->run();
