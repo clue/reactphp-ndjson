@@ -2,20 +2,18 @@
 
 // $ php examples/validate.php < examples/users.ndjson
 
-use React\EventLoop\Factory;
-use React\Stream\ReadableResourceStream;
-use React\Stream\WritableResourceStream;
 use Clue\React\NDJson\Decoder;
 use Clue\React\NDJson\Encoder;
+use React\EventLoop\Loop;
+use React\Stream\ReadableResourceStream;
+use React\Stream\WritableResourceStream;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$loop = Factory::create();
-
 $exit = 0;
-$in = new ReadableResourceStream(STDIN, $loop);
-$out = new WritableResourceStream(STDOUT, $loop);
-$info = new WritableResourceStream(STDERR, $loop);
+$in = new ReadableResourceStream(STDIN);
+$out = new WritableResourceStream(STDOUT);
+$info = new WritableResourceStream(STDERR);
 
 $decoder = new Decoder($in);
 $encoder = new Encoder($out);
@@ -30,6 +28,6 @@ $info->write('You can pipe/write a valid NDJson stream to STDIN' . PHP_EOL);
 $info->write('Valid NDJson will be forwarded to STDOUT' . PHP_EOL);
 $info->write('Invalid NDJson will raise an error on STDERR and exit with code 1' . PHP_EOL);
 
-$loop->run();
+Loop::run();
 
 exit($exit);

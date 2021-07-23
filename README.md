@@ -134,7 +134,7 @@ as parsed values instead of just chunks of strings:
 ```
 
 ```php
-$stdin = new ReadableResourceStream(STDIN, $loop);
+$stdin = new ReadableResourceStream(STDIN);
 
 $stream = new Decoder($stdin);
 
@@ -234,7 +234,7 @@ and accepts its data through the same interface, but handles any data as complet
 JSON elements instead of just chunks of strings:
 
 ```php
-$stdout = new WritableResourceStream(STDOUT, $loop);
+$stdout = new WritableResourceStream(STDOUT);
 
 $stream = new Encoder($stdout);
 
