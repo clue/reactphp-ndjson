@@ -14,9 +14,7 @@
 // 3) pipe NDJSON into benchmark script:
 // $ php examples/91-benchmark-count.php < title.ratings.ndjson
 
-use Clue\React\NDJson\Decoder;
 use React\EventLoop\Loop;
-use React\Stream\ReadableResourceStream;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -24,7 +22,7 @@ if (extension_loaded('xdebug')) {
     echo 'NOTICE: The "xdebug" extension is loaded, this has a major impact on performance.' . PHP_EOL;
 }
 
-$ndjson = new Decoder(new ReadableResourceStream(STDIN), true);
+$ndjson = new Clue\React\NDJson\Decoder(new React\Stream\ReadableResourceStream(STDIN), true);
 
 $count = 0;
 $ndjson->on('data', function () use (&$count) {

@@ -1,6 +1,6 @@
 # clue/reactphp-ndjson
 
-[![CI status](https://github.com/clue/reactphp-ndjson/workflows/CI/badge.svg)](https://github.com/clue/reactphp-ndjson/actions)
+[![CI status](https://github.com/clue/reactphp-ndjson/actions/workflows/ci.yml/badge.svg)](https://github.com/clue/reactphp-ndjson/actions)
 [![installs on Packagist](https://img.shields.io/packagist/dt/clue/ndjson-react?color=blue&label=installs%20on%20Packagist)](https://packagist.org/packages/clue/ndjson-react)
 
 Streaming newline-delimited JSON ([NDJSON](http://ndjson.org/)) parser and encoder for [ReactPHP](https://reactphp.org/).
@@ -10,7 +10,7 @@ file to store any kind of (uniform) structured data, such as a list of user
 objects or log entries. It uses a simple newline character between each
 individual record and as such can be both used for efficient persistence and
 simple append-style operations. This also allows it to be used in a streaming
-context, such as a simple inter-process commmunication (IPC) protocol or for a
+context, such as a simple inter-process communication (IPC) protocol or for a
 remote procedure call (RPC) mechanism. This library provides a simple
 streaming API to process very large NDJSON files with thousands or even millions
 of rows efficiently without having to load the whole file into memory at once.
@@ -39,7 +39,7 @@ of rows efficiently without having to load the whole file into memory at once.
 
 ## Support us
 
-We invest a lot of time developing, maintaining and updating our awesome
+We invest a lot of time developing, maintaining, and updating our awesome
 open-source projects. You can help us sustain this high-quality of our work by
 [becoming a sponsor on GitHub](https://github.com/sponsors/clue). Sponsors get
 numerous benefits in return, see our [sponsoring page](https://github.com/sponsors/clue)
@@ -75,7 +75,7 @@ no "outer array" to be modified). This makes it a perfect fit for a streaming
 context, for line-oriented CLI tools (such as `grep` and others) or for a logging
 context where you want to append records at a later time. Additionally, this
 also allows it to be used in a streaming context, such as a simple inter-process
-commmunication (IPC) protocol or for a remote procedure call (RPC) mechanism.
+communication (IPC) protocol or for a remote procedure call (RPC) mechanism.
 
 The newline character at the end of each line allows for some really simple
 *framing* (detecting individual records). While each individual line is valid
@@ -134,12 +134,12 @@ as parsed values instead of just chunks of strings:
 ```
 
 ```php
-$stdin = new ReadableResourceStream(STDIN);
+$stdin = new React\Stream\ReadableResourceStream(STDIN);
 
-$ndjson = new Decoder($stdin);
+$ndjson = new Clue\React\NDJson\Decoder($stdin);
 
 $ndjson->on('data', function ($data) {
-    // data is a parsed element from the JSON stream
+    // $data is a parsed element from the JSON stream
     // line 1: $data = (object)array('name' => 'test', 'active' => true);
     // line 2: $data = (object)array('name' => 'hello wörld', 'active' => true);
     var_dump($data);
@@ -157,7 +157,7 @@ This means that, by default, JSON objects will be emitted as a `stdClass`.
 This behavior can be controlled through the optional constructor parameters:
 
 ```php
-$ndjson = new Decoder($stdin, true);
+$ndjson = new Clue\React\NDJson\Decoder($stdin, true);
 
 $ndjson->on('data', function ($data) {
     // JSON objects will be emitted as assoc arrays now
@@ -171,7 +171,7 @@ unreasonably long lines. It accepts an additional argument if you want to change
 this from the default of 64 KiB:
 
 ```php
-$ndjson = new Decoder($stdin, false, 512, 0, 64 * 1024);
+$ndjson = new Clue\React\NDJson\Decoder($stdin, false, 512, 0, 64 * 1024);
 ```
 
 If the underlying stream emits an `error` event or the plain stream contains
@@ -234,9 +234,9 @@ and accepts its data through the same interface, but handles any data as complet
 JSON elements instead of just chunks of strings:
 
 ```php
-$stdout = new WritableResourceStream(STDOUT);
+$stdout = new React\Stream\WritableResourceStream(STDOUT);
 
-$ndjson = new Encoder($stdout);
+$ndjson = new Clue\React\NDJson\Encoder($stdout);
 
 $ndjson->write(array('name' => 'test', 'active' => true));
 $ndjson->write(array('name' => 'hello wörld', 'active' => true));
@@ -248,11 +248,11 @@ $ndjson->write(array('name' => 'hello wörld', 'active' => true));
 
 The `Encoder` supports the same parameters as the underlying
 [`json_encode()`](https://www.php.net/manual/en/function.json-encode.php) function.
-This means that, by default, unicode characters will be escaped in the output.
+This means that, by default, Unicode characters will be escaped in the output.
 This behavior can be controlled through the optional constructor parameters:
 
 ```php
-$ndjson = new Encoder($stdout, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+$ndjson = new Clue\React\NDJson\Encoder($stdout, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
 $ndjson->write('hello wörld');
 ```
@@ -302,7 +302,7 @@ For more details, see ReactPHP's
 
 ## Install
 
-The recommended way to install this library is [through Composer](https://getcomposer.org).
+The recommended way to install this library is [through Composer](https://getcomposer.org/).
 [New to Composer?](https://getcomposer.org/doc/00-intro.md)
 
 This project follows [SemVer](https://semver.org/).
@@ -317,12 +317,12 @@ See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
 This project aims to run on any platform and thus does not require any PHP
 extensions and supports running on legacy PHP 5.3 through current PHP 8+ and
 HHVM.
-It's *highly recommended to use PHP 7+* for this project.
+It's *highly recommended to use the latest supported PHP version* for this project.
 
 ## Tests
 
 To run the test suite, you first need to clone this repo and then install all
-dependencies [through Composer](https://getcomposer.org):
+dependencies [through Composer](https://getcomposer.org/):
 
 ```bash
 $ composer install
@@ -331,7 +331,7 @@ $ composer install
 To run the test suite, go to the project root and run:
 
 ```bash
-$ php vendor/bin/phpunit
+$ vendor/bin/phpunit
 ```
 
 ## License
