@@ -15,11 +15,11 @@ $in = new ReadableResourceStream(STDIN);
 $out = new WritableResourceStream(STDOUT);
 $info = new WritableResourceStream(STDERR);
 
-$decoder = new Decoder($in);
+$ndjson = new Decoder($in);
 $encoder = new Encoder($out);
-$decoder->pipe($encoder);
+$ndjson->pipe($encoder);
 
-$decoder->on('error', function (Exception $e) use ($info, &$exit) {
+$ndjson->on('error', function (Exception $e) use ($info, &$exit) {
     $info->write('ERROR: ' . $e->getMessage() . PHP_EOL);
     $exit = 1;
 });

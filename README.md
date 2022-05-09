@@ -136,9 +136,9 @@ as parsed values instead of just chunks of strings:
 ```php
 $stdin = new ReadableResourceStream(STDIN);
 
-$stream = new Decoder($stdin);
+$ndjson = new Decoder($stdin);
 
-$stream->on('data', function ($data) {
+$ndjson->on('data', function ($data) {
     // data is a parsed element from the JSON stream
     // line 1: $data = (object)array('name' => 'test', 'active' => true);
     // line 2: $data = (object)array('name' => 'hello wörld', 'active' => true);
@@ -157,9 +157,9 @@ This means that, by default, JSON objects will be emitted as a `stdClass`.
 This behavior can be controlled through the optional constructor parameters:
 
 ```php
-$stream = new Decoder($stdin, true);
+$ndjson = new Decoder($stdin, true);
 
-$stream->on('data', function ($data) {
+$ndjson->on('data', function ($data) {
     // JSON objects will be emitted as assoc arrays now
 });
 ```
@@ -171,7 +171,7 @@ unreasonably long lines. It accepts an additional argument if you want to change
 this from the default of 64 KiB:
 
 ```php
-$stream = new Decoder($stdin, false, 512, 0, 64 * 1024);
+$ndjson = new Decoder($stdin, false, 512, 0, 64 * 1024);
 ```
 
 If the underlying stream emits an `error` event or the plain stream contains
@@ -179,7 +179,7 @@ any data that does not represent a valid NDJson stream,
 it will emit an `error` event and then `close` the input stream:
 
 ```php
-$stream->on('error', function (Exception $error) {
+$ndjson->on('error', function (Exception $error) {
     // an error occured, stream will close next
 });
 ```
@@ -190,7 +190,7 @@ followed by an `end` event on success or an `error` event for
 incomplete/invalid JSON data as above:
 
 ```php
-$stream->on('end', function () {
+$ndjson->on('end', function () {
     // stream successfully ended, stream will close next
 });
 ```
@@ -199,7 +199,7 @@ If either the underlying stream or the `Decoder` is closed, it will forward
 the `close` event:
 
 ```php
-$stream->on('close', function () {
+$ndjson->on('close', function () {
     // stream closed
     // possibly after an "end" event or due to an "error" event
 });
@@ -209,7 +209,7 @@ The `close(): void` method can be used to explicitly close the `Decoder` and
 its underlying stream:
 
 ```php
-$stream->close();
+$ndjson->close();
 ```
 
 The `pipe(WritableStreamInterface $dest, array $options = array(): WritableStreamInterface`
@@ -218,7 +218,7 @@ Please note that the `Decoder` emits decoded/parsed data events, while many
 (most?) writable streams expect only data chunks:
 
 ```php
-$stream->pipe($logger);
+$ndjson->pipe($logger);
 ```
 
 For more details, see ReactPHP's
@@ -236,10 +236,10 @@ JSON elements instead of just chunks of strings:
 ```php
 $stdout = new WritableResourceStream(STDOUT);
 
-$stream = new Encoder($stdout);
+$ndjson = new Encoder($stdout);
 
-$stream->write(array('name' => 'test', 'active' => true));
-$stream->write(array('name' => 'hello wörld', 'active' => true));
+$ndjson->write(array('name' => 'test', 'active' => true));
+$ndjson->write(array('name' => 'hello wörld', 'active' => true));
 ```
 ```
 {"name":"test","active":true}
@@ -252,9 +252,9 @@ This means that, by default, unicode characters will be escaped in the output.
 This behavior can be controlled through the optional constructor parameters:
 
 ```php
-$stream = new Encoder($stdout, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+$ndjson = new Encoder($stdout, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-$stream->write('hello wörld');
+$ndjson->write('hello wörld');
 ```
 ```
 "hello wörld"
@@ -268,7 +268,7 @@ any data that can not be represented as a valid NDJSON stream,
 it will emit an `error` event and then `close` the input stream:
 
 ```php
-$stream->on('error', function (Exception $error) {
+$ndjson->on('error', function (Exception $error) {
     // an error occured, stream will close next
 });
 ```
@@ -277,7 +277,7 @@ If either the underlying stream or the `Encoder` is closed, it will forward
 the `close` event:
 
 ```php
-$stream->on('close', function () {
+$ndjson->on('close', function () {
     // stream closed
     // possibly after an "end" event or due to an "error" event
 });
@@ -287,14 +287,14 @@ The `end(mixed $data = null): void` method can be used to optionally emit
 any final data and then soft-close the `Encoder` and its underlying stream:
 
 ```php
-$stream->end();
+$ndjson->end();
 ```
 
 The `close(): void` method can be used to explicitly close the `Encoder` and
 its underlying stream:
 
 ```php
-$stream->close();
+$ndjson->close();
 ```
 
 For more details, see ReactPHP's
