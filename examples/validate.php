@@ -2,24 +2,20 @@
 
 // $ php examples/validate.php < examples/users.ndjson
 
-use Clue\React\NDJson\Decoder;
-use Clue\React\NDJson\Encoder;
 use React\EventLoop\Loop;
-use React\Stream\ReadableResourceStream;
-use React\Stream\WritableResourceStream;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 $exit = 0;
-$in = new ReadableResourceStream(STDIN);
-$out = new WritableResourceStream(STDOUT);
-$info = new WritableResourceStream(STDERR);
+$in = new React\Stream\ReadableResourceStream(STDIN);
+$out = new React\Stream\WritableResourceStream(STDOUT);
+$info = new React\Stream\WritableResourceStream(STDERR);
 
-$decoder = new Decoder($in);
-$encoder = new Encoder($out);
-$decoder->pipe($encoder);
+$ndjson = new Clue\React\NDJson\Decoder($in);
+$encoder = new Clue\React\NDJson\Encoder($out);
+$ndjson->pipe($encoder);
 
-$decoder->on('error', function (Exception $e) use ($info, &$exit) {
+$ndjson->on('error', function (Exception $e) use ($info, &$exit) {
     $info->write('ERROR: ' . $e->getMessage() . PHP_EOL);
     $exit = 1;
 });
