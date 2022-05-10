@@ -99,6 +99,11 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
     /** @internal */
     public function handleData($data)
     {
+        if (!\is_string($data)) {
+            $this->handleError(new \UnexpectedValueException('Expected stream to emit string, but got ' . \gettype($data)));
+            return;
+        }
+
         $this->buffer .= $data;
 
         // keep parsing while a newline has been found
