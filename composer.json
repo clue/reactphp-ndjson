@@ -15,8 +15,8 @@
         "react/stream": "^1.2"
     },
     "require-dev": {
-        "react/event-loop": "^1.2",
-        "phpunit/phpunit": "^9.3 || ^5.7 || ^4.8.35"
+        "phpunit/phpunit": "^9.5 || ^5.7 || ^4.8.35",
+        "react/event-loop": "^1.2"
     },
     "autoload": {
         "psr-4": { "Clue\\React\\NDJson\\": "src/" }
