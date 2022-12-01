@@ -19,9 +19,13 @@
         "react/event-loop": "^1.2"
     },
     "autoload": {
-        "psr-4": { "Clue\\React\\NDJson\\": "src/" }
+        "psr-4": {
+            "Clue\\React\\NDJson\\": "src/"
+        }
     },
     "autoload-dev": {
-        "psr-4": { "Clue\\Tests\\React\\NDJson\\": "tests/" }
+        "psr-4": {
+            "Clue\\Tests\\React\\NDJson\\": "tests/"
+        }
     }
 }
