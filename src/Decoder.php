@@ -113,11 +113,14 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
             $this->buffer = (string)\substr($this->buffer, $newline + 1);
 
             // decode data with options given in ctor
+            // @codeCoverageIgnoreStart
             if ($this->options === 0) {
                 $data = \json_decode($data, $this->assoc, $this->depth);
             } else {
+                assert(\PHP_VERSION_ID >= 50400);
                 $data = \json_decode($data, $this->assoc, $this->depth, $this->options);
             }
+            // @codeCoverageIgnoreEnd
 
             // abort stream if decoding failed
             if ($data === null && \json_last_error() !== \JSON_ERROR_NONE) {
