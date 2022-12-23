@@ -2,6 +2,7 @@
 
 [![CI status](https://github.com/clue/reactphp-ndjson/actions/workflows/ci.yml/badge.svg)](https://github.com/clue/reactphp-ndjson/actions)
 [![installs on Packagist](https://img.shields.io/packagist/dt/clue/ndjson-react?color=blue&label=installs%20on%20Packagist)](https://packagist.org/packages/clue/ndjson-react)
+[![code coverage](https://img.shields.io/badge/code%20coverage-100%25-success)](#tests)
 
 Streaming newline-delimited JSON ([NDJSON](http://ndjson.org/)) parser and encoder for [ReactPHP](https://reactphp.org/).
 
@@ -309,7 +310,7 @@ This project follows [SemVer](https://semver.org/).
 This will install the latest supported version:
 
 ```bash
-$ composer require clue/ndjson-react:^1.2
+composer require clue/ndjson-react:^1.3
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
@@ -325,13 +326,13 @@ To run the test suite, you first need to clone this repo and then install all
 dependencies [through Composer](https://getcomposer.org/):
 
 ```bash
-$ composer install
+composer install
 ```
 
 To run the test suite, go to the project root and run:
 
 ```bash
-$ vendor/bin/phpunit
+vendor/bin/phpunit
 ```
 
 ## License
