@@ -26,7 +26,7 @@
     ignore `JSON_THROW_ON_ERROR` option (available as of PHP 7.3).
     (#14 by @clue)
 
-*   Feature: Add bechmarking script and import all global function references.
+*   Feature: Add benchmarking script and import all global function references.
     (#16 by @clue)
 
 *   Improve documentation and add NDJSON format description and
@@ -50,7 +50,7 @@
 *   Feature: Limit buffer size to 64 KiB by default.
     (#10 by @clue)
 
-*   Feature: Forward compatiblity with EventLoop v0.5 and upcoming v1.0.
+*   Feature: Forward compatibility with EventLoop v0.5 and upcoming v1.0.
     (#8 by @clue)
 
 *   Fix: Return bool `false` if encoding fails due to invalid value to pause source.

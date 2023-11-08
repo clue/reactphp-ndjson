@@ -181,7 +181,7 @@ it will emit an `error` event and then `close` the input stream:
 
 ```php
 $ndjson->on('error', function (Exception $error) {
-    // an error occured, stream will close next
+    // an error occurred, stream will close next
 });
 ```
 
@@ -270,7 +270,7 @@ it will emit an `error` event and then `close` the input stream:
 
 ```php
 $ndjson->on('error', function (Exception $error) {
-    // an error occured, stream will close next
+    // an error occurred, stream will close next
 });
 ```
 
