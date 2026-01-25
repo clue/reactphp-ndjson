@@ -12,11 +12,11 @@
     ],
     "require": {
         "php": ">=5.3",
-        "react/stream": "^1.2"
+        "react/stream": "^1.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6 || ^8.5 || ^5.7 || ^4.8.36",
-        "react/event-loop": "^1.2"
+        "react/event-loop": "^1.6"
     },
     "autoload": {
         "psr-4": {
