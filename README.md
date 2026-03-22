@@ -4,9 +4,9 @@
 [![installs on Packagist](https://img.shields.io/packagist/dt/clue/ndjson-react?color=blue&label=installs%20on%20Packagist)](https://packagist.org/packages/clue/ndjson-react)
 [![code coverage](https://img.shields.io/badge/code%20coverage-100%25-success)](#tests)
 
-Streaming newline-delimited JSON ([NDJSON](http://ndjson.org/)) parser and encoder for [ReactPHP](https://reactphp.org/).
+Streaming newline-delimited JSON (NDJSON) parser and encoder for [ReactPHP](https://reactphp.org/).
 
-[NDJSON](http://ndjson.org/) can be used to store multiple JSON records in a
+NDJSON can be used to store multiple JSON records in a
 file to store any kind of (uniform) structured data, such as a list of user
 objects or log entries. It uses a simple newline character between each
 individual record and as such can be both used for efficient persistence and
