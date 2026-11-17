@@ -61,6 +61,11 @@ class DecoderTest extends TestCase
         if (!defined('JSON_BIGINT_AS_STRING')) {
             $this->markTestSkipped('Const JSON_BIGINT_AS_STRING only available in PHP 5.4+');
         }
+
+        if (\extension_loaded('simdjson')) {
+            $this->markTestSkipped('Flags cannot be passed to simdjson_decode');
+        }
+
         $this->decoder = new Decoder($this->input, false, 512, JSON_BIGINT_AS_STRING);
         $this->decoder->on('data', $this->expectCallableOnceWith($this->identicalTo('999888777666555444333222111000')));
 
@@ -87,8 +92,8 @@ class DecoderTest extends TestCase
         $this->input->emit('data', array("invalid\n"));
 
         $this->assertInstanceOf('RuntimeException', $error);
-        $this->assertContainsString('Syntax error', $error->getMessage());
-        $this->assertEquals(JSON_ERROR_SYNTAX, $error->getCode());
+        $this->assertMatchesRegularExpression('/(syntax error|improper structure)/i', $error->getMessage());
+        $this->assertEquals(\extension_loaded('simdjson') ? SIMDJSON_ERR_TAPE_ERROR : JSON_ERROR_SYNTAX, $error->getCode());
     }
 
     public function testEmitDataErrorWillForwardErrorAlsoWhenCreatedWithThrowOnError()

@@ -112,6 +112,19 @@ class Decoder extends EventEmitter implements ReadableStreamInterface
             $data = (string)\substr($this->buffer, 0, $newline);
             $this->buffer = (string)\substr($this->buffer, $newline + 1);
 
+            // decode data with simdjson when the extension is available
+            if (\extension_loaded('simdjson')) {
+                try {
+                    $data = \simdjson_decode($data, $this->assoc, $this->depth);
+
+                    $this->emit('data', array($data));
+                } catch (\Throwable $err) {
+                    $this->handleError(new \RuntimeException('Unable to decode JSON: ' . $err->getMessage(), $err->getCode(), $err));
+                }
+
+                continue;
+            }
+
             // decode data with options given in ctor
             // @codeCoverageIgnoreStart
             if ($this->options === 0) {
